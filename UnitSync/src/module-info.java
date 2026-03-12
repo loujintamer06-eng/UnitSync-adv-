@@ -1,8 +1,3 @@
-/**
- * 
- */
-/**
- * 
- */
-module UnitSync {
+module adv {
+    requires java.sql;
 }
