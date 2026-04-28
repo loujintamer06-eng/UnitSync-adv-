@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>UnitSync Admin</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" th:href="@{/styles.css}"/>
+<script th:inline="none">
+window.updatePaymentStatus = function(sel) {
+    var id = sel.getAttribute('data-id');
+    var status = sel.value;
+    sel.className = 'status-select ' + status.toLowerCase();
+    fetch('/payments/update/' + id + '/' + status, { method: 'PUT' })
+        .then(function(res){ console.log('Payment updated'); })
+        .catch(function(err){ console.log('Error: ' + err); });
+    window.updateDashboard();
+};
+
+window.updateResidentStatus = function(sel) {
+    var id = sel.getAttribute('data-id');
+    var status = sel.value;
+    sel.className = 'status-select ' + status.toLowerCase();
+    fetch('/residents/update/' + id + '/' + status, { method: 'PUT' })
+        .then(function(res){ console.log('Resident updated'); })
+        .catch(function(err){ console.log('Error: ' + err); });
+};
+
+window.updateAmenityStatus = function(sel) {
+    var id = sel.getAttribute('data-id');
+    var status = sel.value;
+    sel.className = 'status-select ' + status.toLowerCase();
+    fetch('/amenities/update/' + id + '/' + status, { method: 'PUT' })
+        .then(function(res){ console.log('Amenity updated'); })
+        .catch(function(err){ console.log('Error: ' + err); });
+    window.updateDashboard();
+};
+
+  window.switchTab = function(el, tab) {
+    document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+  };
+  
+  window.openModal = function(id){ document.getElementById(id).classList.add('open'); };
+  window.closeModal = function(id){ document.getElementById(id).classList.remove('open'); };
+  window.updateStatus = function(sel){ sel.className = 'status-select ' + sel.value; window.updateDashboard(); };
+  window.fmtDate = function(str){ if(!str) return '—'; return new Date(str).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
+  window.clearFields = function(){ for(var i=0;i<arguments.length;i++){ var el=document.getElementById(arguments[i]); if(el) el.value=''; } };
+  
+  window.makeSelect = function(type, val){
+    var opts = {
+      worker:  [['active','Available'],['overdue','Booked']],
+      amenity: [['open','Open'],['closed','Closed'],['maintenance','Maintenance']],
+      payment: [['paid','Paid'],['pending','Pending'],['overdue','Overdue']]
+    };
+    var list = opts[type] || [];
+    return '<select class="status-select '+val+'" onchange="updateStatus(this)">'+list.map(function(o){ return '<option value="'+o[0]+'"'+(o[0]===val?' selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>';
+  };
+  window.updateDashboard = function(){
+	    document.getElementById('dash-residents').textContent = document.getElementById('residents-tbody').querySelectorAll('tr').length;
+	    document.getElementById('dash-payments').textContent = [].slice.call(document.getElementById('payments-tbody').querySelectorAll('tr')).filter(function(row){
+	        var sel = row.querySelector('select');
+	        return sel && (sel.value === 'Unpaid' || sel.value === 'Overdue');
+	    }).length;
+	    document.getElementById('dash-amenities').textContent = [].slice.call(document.getElementById('amenities-tbody').querySelectorAll('tr')).filter(function(row){
+	        var sel = row.querySelector('select');
+	        return sel && sel.value === 'Available';
+	    }).length;
+	};
+	window.addResident = function(){
+		  var fn = document.getElementById('r-fname').value.trim();
+		  var ln = document.getElementById('r-lname').value.trim();
+		  var unit = document.getElementById('r-unit').value.trim();
+		  var status = document.getElementById('r-status').value;
+		  var username = document.getElementById('r-username').value.trim();
+		  var password = document.getElementById('r-password').value.trim();
+
+		  if(!fn || !unit){ alert('Name and unit are required.'); return; }
+		  if(!username || !password){ alert('Username and password are required.'); return; }
+
+		  fetch('/residents/add', {
+		    method: 'POST',
+		    headers: { 'Content-Type': 'application/json' },
+		    body: JSON.stringify({ firstName: fn, lastName: ln, aptNumber: unit, status: status, username: username, password: password })
+		  })
+		  .then(function(res){ return res.text(); })
+		  .then(function(){
+		    var row = document.createElement('tr');
+		    row.innerHTML = '<td>'+fn+' '+ln+'</td><td>'+unit+'</td><td>'+status+'</td>';
+		    document.getElementById('residents-tbody').appendChild(row);
+		    window.closeModal('modal-resident');
+		    window.clearFields('r-fname','r-lname','r-unit','r-username','r-password');
+		    window.updateDashboard();
+		  })
+		  .catch(function(err){ alert('Error saving resident: '+err); });
+		};
+	window.addAmenity = function(){
+		  var name = document.getElementById('a-name').value.trim();
+		  var loc = document.getElementById('a-location').value.trim();
+		  var svc = document.getElementById('a-serviced').value;
+		  var status = document.getElementById('a-status').value;
+
+		  if(!name){ alert('Amenity name is required.'); return; }
+
+		  fetch('/amenities/add', {
+		    method: 'POST',
+		    headers: { 'Content-Type': 'application/json' },
+		    body: JSON.stringify({ name: name, location: loc, availableFrom: svc, availability: status })
+		  })
+		  .then(function(res){ return res.text(); })
+		  .then(function(){
+		    var row = document.createElement('tr');
+		    row.innerHTML =
+		      '<td>'+name+'</td>' +
+		      '<td>'+(loc||'—')+'</td>' +
+		      '<td>'+window.makeSelect('amenity', status.toLowerCase())+'</td>' +
+		      '<td>'+(svc||'—')+'</td>';
+		    document.getElementById('amenities-tbody').appendChild(row);
+		    window.closeModal('modal-amenity');
+		    window.clearFields('a-name','a-location','a-serviced');
+		    window.updateDashboard();
+		  })
+		  .catch(function(err){ alert('Error saving amenity: '+err); });
+		};
+		window.addPayment = function(){
+			  var id = document.getElementById('p-resid').value.trim();
+			  var amount = document.getElementById('p-amount').value.trim();
+			  var date = document.getElementById('p-date').value;
+			  var status = document.getElementById('p-status').value;
+
+			  if(!id){ alert('Resident ID required'); return; }
+
+			  fetch('/payments/add', {
+			    method: 'POST',
+			    headers: { 'Content-Type': 'application/json' },
+			    body: JSON.stringify({ resId: parseInt(id), amount: parseFloat(amount), dueDate: date, status: status })
+			  })
+			  .then(function(res){ return res.text(); })
+			  .then(function(){
+			    var row = document.createElement('tr');
+			    row.innerHTML = '<td>'+id+'</td><td>'+(amount?'$'+amount:'—')+'</td><td>'+window.makeSelect('payment', status.toLowerCase())+'</td><td>'+window.fmtDate(date)+'</td>';
+			    document.getElementById('payments-tbody').appendChild(row);
+			    window.closeModal('modal-payment');
+			    window.clearFields('p-resid','p-amount','p-date');
+			    window.updateDashboard();
+			  })
+			  .catch(function(err){ alert('Error saving payment: '+err); });
+			};
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.modal-overlay').forEach(function(o){
+      o.addEventListener('click', function(e){ if(e.target===o) o.classList.remove('open'); });
+    });
+    document.querySelectorAll('.search-box').forEach(function(input){
+      input.addEventListener('input', function(){
+        var val=input.value.toLowerCase();
+        document.getElementById(input.dataset.table).querySelectorAll('tr').forEach(function(row){
+          row.style.display=row.textContent.toLowerCase().includes(val)?'':'none';
+        });
+      });
+    });
+    window.updateDashboard();
+  });
+</script>
+</head>
+<body>
+
+<header>
+  <div class="logo">UnitSync</div>
+  <div class="admin-badge">Admin — Amanda Sherif</div>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="nav-item active" onclick="switchTab(this,'dashboard')">Dashboard</div>
+    <div class="nav-item" onclick="switchTab(this,'residents')">Residents</div>
+    <div class="nav-item" onclick="switchTab(this,'amenities')">Amenities</div>
+    <div class="nav-item" onclick="switchTab(this,'payments')">Payments</div>
+  </aside>
+
+  <main>
+
+    <div class="tab-content active" id="tab-dashboard">
+      <h1>Dashboard</h1>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total residents</div><div class="stat-value" id="dash-residents">0</div></div>
+        <div class="stat-card"><div class="stat-label">Pending payments</div><div class="stat-value" id="dash-payments">0</div></div>
+        <div class="stat-card"><div class="stat-label">Open amenities</div><div class="stat-value" id="dash-amenities">0</div></div>
+      </div>
+      <div class="section-title">Recent Activity</div>
+      <table>
+        <thead><tr><th>Event</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody id="dash-activity">
+          <tr><td>Apt 12A — payment due</td><td>Apr 10</td><td><span style="background:var(--overdue-bg);color:var(--overdue-color);padding:4px 12px;border-radius:999px;font-size:0.8rem;font-weight:500;">Overdue</span></td></tr>
+          <tr><td>Pool maintenance request</td><td>Apr 11</td><td><span style="background:var(--pending-bg);color:var(--pending-color);padding:4px 12px;border-radius:999px;font-size:0.8rem;font-weight:500;">Pending</span></td></tr>
+          <tr><td>Apt 3B — new resident</td><td>Apr 9</td><td><span style="background:var(--active-bg);color:var(--active-color);padding:4px 12px;border-radius:999px;font-size:0.8rem;font-weight:500;">Active</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tab-content" id="tab-residents">
+      <h1>Residents</h1>
+      <div class="toolbar">
+        <input class="search-box" type="text" placeholder="Search residents" data-table="residents-tbody"/>
+        <button class="btn" onclick="openModal('modal-resident')">+ Add Resident</button>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Unit</th><th>Status</th></tr></thead>
+        <tbody id="residents-tbody">
+  <tr th:each="resident : ${residents}">
+    <td th:text="${resident.firstName + ' ' + resident.lastName}"></td>
+    <td th:text="${resident.aptNumber}"></td>
+    <td>
+      <select class="status-select"
+              th:classappend="${resident.status.toLowerCase()}"
+              th:data-id="${resident.resid}"
+              onchange="updateResidentStatus(this)">
+        <option value="Owner" th:selected="${resident.status == 'Owner'}">Owner</option>
+        <option value="Renter" th:selected="${resident.status == 'Renter'}">Renter</option>
+        <option value="Renting" th:selected="${resident.status == 'Renting'}">Renting</option>
+      </select>
+    </td>
+  </tr>
+</tbody>
+      </table>
+    </div>
+
+    <div class="tab-content" id="tab-amenities">
+      <h1>Amenities</h1>
+      <div class="toolbar">
+        <input class="search-box" type="text" placeholder="Search amenities" data-table="amenities-tbody"/>
+        <button class="btn" onclick="openModal('modal-amenity')">+ Add Amenity</button>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Location</th><th>Availability</th><th>Available From</th></tr></thead>
+        <tbody id="amenities-tbody">
+  <tr th:each="amenity : ${amenities}">
+    <td th:text="${amenity.name}"></td>
+    <td th:text="${amenity.location}"></td>
+    <td>
+      <select class="status-select"
+              th:classappend="${amenity.availability.toLowerCase()}"
+              th:data-id="${amenity.amenityId}"
+              onchange="updateAmenityStatus(this)">
+        <option value="Available" th:selected="${amenity.availability == 'Available'}">Available</option>
+        <option value="Unavailable" th:selected="${amenity.availability == 'Unavailable'}">Unavailable</option>
+        <option value="Maintenance" th:selected="${amenity.availability == 'Maintenance'}">Maintenance</option>
+      </select>
+    </td>
+    <td th:text="${amenity.availableFrom}"></td>
+  </tr>
+</tbody>
+      </table>
+    </div>
+
+    <div class="tab-content" id="tab-payments">
+      <h1>Payments</h1>
+      <div class="toolbar">
+        <input class="search-box" type="text" placeholder="Search payments" data-table="payments-tbody"/>
+        <button class="btn" onclick="openModal('modal-payment')">+ Record Payment</button>
+      </div>
+      <table>
+        <thead><tr><th>Resident ID</th><th>Amount</th><th>Status</th><th>Due Date</th></tr></thead>
+        <tbody id="payments-tbody">
+  <tr th:each="payment : ${payments}">
+    <td th:text="${payment.resId}"></td>
+    <td th:text="${payment.amount}"></td>
+    <td>
+      <select class="status-select"
+              th:classappend="${payment.status.toLowerCase()}"
+              th:data-id="${payment.paymentId}"
+              onchange="updatePaymentStatus(this)">
+        <option value="Paid" th:selected="${payment.status == 'Paid'}">Paid</option>
+        <option value="Unpaid" th:selected="${payment.status == 'Unpaid'}">Unpaid</option>
+        <option value="Overdue" th:selected="${payment.status == 'Overdue'}">Overdue</option>
+      </select>
+    </td>
+    <td th:text="${payment.dueDate}"></td>
+  </tr>
+</tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-resident">
+  <div class="modal">
+    <div class="modal-header"><h2>Add Resident</h2><button class="modal-close" onclick="closeModal('modal-resident')">&#x2715;</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>First Name</label><input type="text" id="r-fname" placeholder="First name"/></div>
+      <div class="form-group"><label>Last Name</label><input type="text" id="r-lname" placeholder="Last name"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Username</label><input type="text" id="r-username" placeholder="Username"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="r-password" placeholder="Password"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Unit Number</label><input type="text" id="r-unit" placeholder="Unit number"/></div>
+      <div class="form-group"><label>Status</label><select id="r-status"><option value="owner">Owner</option><option value="renter">Renter</option><option value="renting">Renting</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-resident')">Cancel</button>
+      <button class="btn" onclick="addResident()">Add Resident</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-amenity">
+  <div class="modal">
+    <div class="modal-header"><h2>Add Amenity</h2><button class="modal-close" onclick="closeModal('modal-amenity')">&#x2715;</button></div>
+    <div class="form-group"><label>Amenity Name</label><input type="text" id="a-name" placeholder="Amenty"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>Location</label><input type="text" id="a-location" placeholder="Location"/></div>
+      <div class="form-group"><label>Available From</label><input type="date" id="a-serviced"/></div>
+    </div>
+    <div class="form-group"><label>Availability</label><select id="a-status"><option value="open">Available</option><option value="Maintenance">Under Maintenance</option><option value="closed">Booked</option></select></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-amenity')">Cancel</button>
+      <button class="btn" onclick="addAmenity()">Add Amenity</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-payment">
+  <div class="modal">
+    <div class="modal-header"><h2>Record Payment</h2><button class="modal-close" onclick="closeModal('modal-payment')">&#x2715;</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Resident ID</label><input type="number" id="p-resid" placeholder="ID"/></div>
+      <div class="form-group"><label>Amount</label><input type="number" id="p-amount" placeholder="Amount"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Due Date</label><input type="date" id="p-date"/></div>
+      <div class="form-group"><label>Status</label><select id="p-status"><option value="paid">Paid</option><option value="unpaid">Unpaid</option><option value="overdue">Overdue</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-payment')">Cancel</button>
+      <button class="btn" onclick="addPayment()">Record Payment</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
