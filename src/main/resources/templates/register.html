@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UnitSync - Register</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 400px; }
+        h1 { text-align: center; margin-bottom: 30px; color: #1a1a2e; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+        button { width: 100%; padding: 12px; background: #4a6fa5; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #3a5a8a; }
+        .error { color: red; text-align: center; margin-top: 10px; }
+        .login-link { text-align: center; margin-top: 20px; }
+        a { color: #4a6fa5; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><b>Unit</b><i>Sync</i></h1>
+        <form method="POST" action="/register">
+            <input type="text" name="name" placeholder="Username" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="radio" name="role" value="worker" checked> Worker
+            <input type="radio" name="role" value="admin"> Admin
+            <input type="radio" name="role" value="resident"> Resident
+            <button type="submit">Register</button>
+        </form>
+        <div class="login-link">
+            <a href="/login">Already have an account? Login</a>
+        </div>
+        <div class="error" th:text="${error}"></div>
+    </div>
+</body>
+</html>

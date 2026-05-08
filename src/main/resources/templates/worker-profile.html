@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Profile</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
+        header { background: #1a1a2e; color: white; padding: 15px 30px; display: flex; justify-content: space-between; }
+        nav { background: white; padding: 10px 30px; }
+        nav a { margin-right: 20px; text-decoration: none; color: #333; }
+        .container { padding: 30px; }
+        form { background: white; padding: 30px; border-radius: 10px; max-width: 600px; }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #4a6fa5; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; }
+        h1 { margin-bottom: 20px; }
+        a { text-decoration: none; color: #333; }
+        .logout { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Profile</h1>
+        <a href="/logout" class="logout">Logout</a>
+    </header>
+    <nav>
+        <a href="/worker/dashboard">Dashboard</a>
+        <a href="/worker/tasks">My Tasks</a>
+        <a href="/worker/profile">Profile</a>
+    </nav>
+    <div class="container">
+        <form method="POST" action="/worker/profile/update">
+            <h1>Edit Profile</h1>
+            <label>Name:</label>
+            <input type="text" th:value="${user.name}" disabled>
+            
+            <label>Email:</label>
+            <input type="email" th:value="${user.email}" disabled>
+            
+            <label>Field of Work:</label>
+            <select name="field">
+                <option value="Electrician">Electrician</option>
+                <option value="Plumber">Plumber</option>
+                <option value="Carpenter">Carpenter</option>
+                <option value="Painter">Painter</option>
+                <option value="Technician">Technician</option>
+            </select>
+            
+            <label>Availability:</label>
+            <select name="availability">
+                <option value="Available">Available</option>
+                <option value="Booked">Booked</option>
+            </select>
+            
+            <label>Shift:</label>
+            <select name="shift">
+                <option value="Morning">Morning</option>
+                <option value="Day">Day</option>
+                <option value="Night">Night</option>
+            </select>
+            
+            <label>Specialization:</label>
+            <textarea name="specialization" rows="4" th:text="${user.specialization}"></textarea>
+            
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</body>
+</html>
