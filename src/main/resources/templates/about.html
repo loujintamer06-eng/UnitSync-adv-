@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UnitSync - About Us</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        :root {
+            --bg: #f5f4f0;
+            --surface: #ffffff;
+            --accent: #3b5bdb;
+            --text: #1a1a1a;
+            --border: #e8e6e0;
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background: var(--bg);
+            min-height: 100vh;
+        }
+
+        nav {
+            background: var(--surface);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links a {
+            margin-left: 30px;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .about-container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .about-section {
+            background: var(--surface);
+            border-radius: 15px;
+            padding: 25px;
+            flex: 1;
+            min-width: 250px;
+            border: 1px solid var(--border);
+        }
+
+        .about-section h2 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .about-section p {
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .about-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .about-section li {
+            padding: 8px 0;
+            color: var(--text);
+        }
+
+        .about-section li::before {
+            content: "✓";
+            color: var(--accent);
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <span style="color: var(--text); font-weight: 700;">Unit</span><span style="font-style: italic;">Sync</span>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/about">About Us</a>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </div>
+    </nav>
+
+    <div class="about-container">
+        <div class="about-section">
+            <h2>Overview</h2>
+            <p>
+                UnitSync is a housing management system designed to simplify how residential
+                units are handled. It brings everything into one place, making management
+                faster and more organized.
+            </p>
+        </div>
+
+        <div class="about-section">
+            <h2>Mission</h2>
+            <p>
+                Our mission is to provide a simple and efficient platform for managing
+                residents, payments, and services without unnecessary complexity.
+            </p>
+        </div>
+
+        <div class="about-section">
+            <h2>Features</h2>
+            <ul>
+                <li>Resident and unit management</li>
+                <li>Payment tracking</li>
+                <li>Service requests</li>
+                <li>Centralized system</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,33 +1,96 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html>
 <head>
-<meta charset='UTF-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0'>
-<title>UnitSync</title>
-<link rel="stylesheet" href="styles.css">
+    <title>UnitSync - Home</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        :root {
+            --bg: #f5f4f0;
+            --surface: #ffffff;
+            --accent: #3b5bdb;
+            --text: #1a1a1a;
+            --border: #e8e6e0;
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background: var(--bg);
+            min-height: 100vh;
+        }
+
+        nav {
+            background: var(--surface);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links a {
+            margin-left: 30px;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            margin: 10px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+        }
+    </style>
 </head>
 <body>
-<header>
-<div class='logo'><b>Unit</b><i>Sync</i></div>
-<nav>
-<a href='/register'>Register</a>
-<a href='/login'>Login</a>
-<a href='/about'>About Us</a>
-</nav>
-</header>
-<section class='hero'>
-  <div class='hero-box'>
-    <h1>Basic knowledge, features and options.</h1>
-    <p>Professional conversions with a clean modern experience.</p>
-    <div class='search'>
-      <input id='searchInput' type='text' placeholder='Search...'>
-      <button onclick='runSearch()'>Search</button>
+    <nav>
+        <div class="logo">
+            <span style="color: var(--text); font-weight: 700;">Unit</span><span style="font-style: italic;">Sync</span>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/about">About Us</a>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>Welcome to Unit<i>Sync</i></h1>
+        <p>Your complete compound management solution</p>
+        <a href="/login" class="btn">Login</a>
+        <a href="/register" class="btn btn-outline">Register</a>
     </div>
-  </div>
-</section>
-<section class='grid'>
-</section>
-<footer>© 2023 UnitSync</footer>
-<script src="index.js"></script>
 </body>
 </html>
