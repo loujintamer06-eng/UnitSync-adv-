@@ -1,0 +1,448 @@
+				<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Payments</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:               #f5f4f0;
+            --surface:          #ffffff;
+            --sidebar-bg:       #f9f8f5;
+            --nav-active-bg:    #dde8ff;
+            --nav-active-color: #3b5bdb;
+            --text:             #1a1a1a;
+            --muted:            #888;
+            --border:           #e8e6e0;
+            --card-bg:          #f2f1ed;
+            --overdue-bg:       #fde8e8;
+            --overdue-color:    #c0392b;
+            --pending-bg:       #fef3e2;
+            --pending-color:    #b7791f;
+            --active-bg:        #e6f4ea;
+            --active-color:     #2e7d32;
+            --inactive-bg:      #efefef;
+            --inactive-color:   #888;
+            --accent:           #3b5bdb;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .layout {
+            display: flex;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        aside {
+            width: 180px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 10px 20px;
+            font-size: 0.92rem;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 0 8px;
+            transition: background 0.15s;
+        }
+
+        .nav-item:hover { background: var(--border); }
+
+        .nav-item.active {
+            background: var(--nav-active-bg);
+            color: var(--nav-active-color);
+            font-weight: 500;
+        }
+
+        main {
+            flex: 1;
+            padding: 32px 36px;
+            overflow-y: auto;
+        }
+
+        main h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 36px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 20px 22px;
+        }
+
+        .stat-label {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
+
+        .section-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        thead th {
+            text-align: left;
+            font-weight: 500;
+            color: var(--muted);
+            font-size: 0.85rem;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.1s;
+        }
+
+        tbody tr:hover { background: var(--card-bg); }
+
+        tbody td {
+            padding: 14px 0;
+            vertical-align: middle;
+        }
+
+        .empty-row td {
+            text-align: center;
+            color: var(--muted);
+            padding: 32px 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: var(--pending-bg);
+            color: var(--pending-color);
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 9px 18px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .btn:hover { opacity: 0.85; }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--accent);
+            border: 1.5px solid var(--accent);
+        }
+
+        .btn-ghost:hover {
+            background: var(--nav-active-bg);
+            opacity: 1;
+        }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 0.8rem;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: var(--active-bg);
+            color: var(--active-color);
+            border: 1px solid #b7dfba;
+        }
+
+        .alert-error {
+            background: var(--overdue-bg);
+            color: var(--overdue-color);
+            border: 1px solid #f5b7b7;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(2px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 32px;
+            width: 460px;
+            max-width: 95vw;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.2s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(18px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--muted);
+            line-height: 1;
+            padding: 0 4px;
+        }
+
+        .modal-close:hover { color: var(--text); }
+
+        .form-group { margin-bottom: 14px; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--text);
+            background: var(--bg);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--accent);
+            background: #fff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <aside>
+        <div class="sidebar-header">UnitSync</div>
+        <a th:href="@{/Profile}" class="nav-item"> Profile</a>
+        <a th:href="@{/booking}" class="nav-item"> Booking</a>
+        <a th:href="@{/payment}" class="nav-item active"> Payment</a>
+    </aside>
+
+    <main>
+        <div class="toolbar">
+            <h1>Payments</h1>
+        </div>
+
+        <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
+        <div th:if="${errorMsg}"   class="alert alert-error"   th:text="${errorMsg}"></div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Pending</div>
+                <div class="stat-value" th:text="${totalPending + ' EGP'}">0 EGP</div>
+            </div>
+        </div>
+
+        <p class="section-title">Pending Payments</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>AMENITY</th>
+                    <th>AMOUNT</th>
+                    <th>DUE DATE</th>
+                    <th>STATUS</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="empty-row" th:if="${#lists.isEmpty(debts)}">
+                    <td colspan="5">No pending payments — you're all caught up ✅</td>
+                </tr>
+                <tr th:each="debt : ${debts}">
+                    <td th:text="${debt.amenity}">—</td>
+                    <td th:text="${debt.amount + ' EGP'}">—</td>
+                    <td th:text="${debt.dueDate}">—</td>
+                    <td><span class="status-badge">Pending</span></td>
+                    <td>
+                       <button class="btn btn-sm"
+        th:data-id="${debt.paymentId}"
+        th:data-amenity="${debt.amenity}"
+        onclick="openPayModal(this.dataset.id, this.dataset.amenity)">
+    Pay Now
+</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div id="payModal" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Payment Details</h2>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <form th:action="@{/payment/pay}" method="post">
+                    <input type="hidden" name="paymentId" id="item_to_pay">
+                    <input type="hidden" name="payMethod" id="method_input" value="card">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" name="firstName" required placeholder="Ahmed">
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" name="lastName" required placeholder="Hassan">
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="cardGroup">
+                        <label>Card Number</label>
+                        <input type="text" name="cardNumber" id="cardInput"
+                               maxlength="16" placeholder="16-digit card number">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-ghost"
+                                onclick="document.getElementById('method_input').value='cash';
+                                         document.getElementById('cardGroup').style.display='none';">
+                            Pay Cash
+                        </button>
+                        <button type="submit" class="btn"
+                                onclick="document.getElementById('method_input').value='card';
+                                         document.getElementById('cardGroup').style.display='block';">
+                            Pay by Card
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function openPayModal(id, amenityName) {
+        document.getElementById('item_to_pay').value = id;
+        document.getElementById('modalTitle').innerText = 'Pay for: ' + amenityName;
+        document.getElementById('cardGroup').style.display = 'block';
+        document.getElementById('method_input').value = 'card';
+        document.getElementById('payModal').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('payModal').classList.remove('open');
+    }
+
+    document.getElementById('payModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+</script>
+</body>
+</html>

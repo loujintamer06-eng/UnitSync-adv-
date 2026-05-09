@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Resident Profile</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:               #f5f4f0;
+            --surface:          #ffffff;
+            --sidebar-bg:       #f9f8f5;
+            --nav-active-bg:    #dde8ff;
+            --nav-active-color: #3b5bdb;
+            --text:             #1a1a1a;
+            --muted:            #888;
+            --border:           #e8e6e0;
+            --card-bg:          #f2f1ed;
+            --overdue-bg:       #fde8e8;
+            --overdue-color:    #c0392b;
+            --pending-bg:       #fef3e2;
+            --pending-color:    #b7791f;
+            --active-bg:        #e6f4ea;
+            --active-color:     #2e7d32;
+            --inactive-bg:      #efefef;
+            --inactive-color:   #888;
+            --accent:           #3b5bdb;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .layout {
+            display: flex;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        aside {
+            width: 180px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 10px 20px;
+            font-size: 0.92rem;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 0 8px;
+            transition: background 0.15s;
+        }
+
+        .nav-item:hover { background: var(--border); }
+
+        .nav-item.active {
+            background: var(--nav-active-bg);
+            color: var(--nav-active-color);
+            font-weight: 500;
+        }
+
+        main {
+            flex: 1;
+            padding: 32px 36px;
+            overflow-y: auto;
+        }
+
+        main h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 0.88rem;
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 36px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 20px 22px;
+            border: 1px solid transparent;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--nav-active-bg);
+            transform: translateY(-3px);
+        }
+
+        .stat-label {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-value.accent {
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <aside>
+        <div class="sidebar-header"> UnitSync</div>
+        <a th:href="@{/Profile}" class="nav-item active"> Profile</a>
+        <a th:href="@{/booking}" class="nav-item"> Booking</a>
+        <a th:href="@{/payment}" class="nav-item"> Payment</a>
+    </aside>
+
+    <main>
+        <h1>Resident Profile</h1>
+        <p class="page-subtitle">Manage and view your details</p>
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-label">Name</div>
+                <div class="stat-value" th:text="${resident.firstname}">--</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Apartment</div>
+                <div class="stat-value" th:text="${resident.apartment}">--</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Resident Type</div>
+                <div class="stat-value accent" th:text="${resident.status}">--</div>
+            </div>
+
+        </div>
+    </main>
+
+</div>
+</body>
+</html>
