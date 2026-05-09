@@ -16,11 +16,6 @@ public class PaymentController {
         return paymentService.getAllPayments();
     }
 
-    @GetMapping("/resident/{resId}")
-    public List<PaymentModel> getByResident(@PathVariable int resId) {
-        return paymentService.getPaymentsByResident(resId);
-    }
-
     @GetMapping("/overdue")
     public List<PaymentModel> getOverdue() {
         return paymentService.getOverduePayments();

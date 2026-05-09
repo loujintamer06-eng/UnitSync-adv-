@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class ResidentController {
 
@@ -18,14 +20,19 @@ public class ResidentController {
     @Autowired
     AmenityService amenityService;
 
-    @GetMapping("/")
-    public String home(Model model) {
+    @GetMapping("/dashboard")
+    public String home(Model model, HttpSession session) {
         model.addAttribute("residents", residentService.getAll());
         model.addAttribute("payments", paymentService.getAllPayments());
         model.addAttribute("amenities", amenityService.getAll());
+        
+        AdminModel admin = (AdminModel) session.getAttribute("admin");
+        if (admin != null) {
+            model.addAttribute("adminName", admin.getFirstname() + " " + admin.getLastname());
+        }
         return "index";
     }
-
+    
     @GetMapping("/residents/all")
     @ResponseBody
     public List<ResidentModel> getAll() {
@@ -44,9 +51,4 @@ public class ResidentController {
         return residentService.updateStatus(resid, status);
     }
 
-    @DeleteMapping("/residents/delete/{resid}")
-    @ResponseBody
-    public String deleteResident(@PathVariable int resid) {
-        return residentService.deleteResident(resid);
-    }
 }

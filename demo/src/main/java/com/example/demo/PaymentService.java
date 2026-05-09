@@ -16,14 +16,6 @@ public class PaymentService {
         return paymentRepository.findAll();
     }
 
-    public List<PaymentModel> getPaymentsByResident(int resId) {
-        List<PaymentModel> payments = paymentRepository.findByResId(resId);
-        if (payments.isEmpty()) {
-            System.out.println("No payments found for this resident");
-        }
-        return payments;
-    }
-
     public List<PaymentModel> getOverduePayments() {
         List<PaymentModel> overdue = paymentRepository.findByStatus("Overdue");
         if (overdue.isEmpty()) {

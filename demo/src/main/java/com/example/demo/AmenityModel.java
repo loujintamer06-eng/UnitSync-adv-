@@ -25,24 +25,66 @@ public class AmenityModel {
 
     @Column(name = "admin_role")
     private String adminRole;
-
+    
     public AmenityModel() {}
 
-    public int getAmenityId() { return amenityId; }
-    public void setAmenityId(int amenityId) { this.amenityId = amenityId; }
+	public AmenityModel(int amenityId, String name, String location, String availability, String availableFrom,
+			String adminRole) {
+		super();
+		this.amenityId = amenityId;
+		this.name = name;
+		this.location = location;
+		this.availability = availability;
+		this.availableFrom = availableFrom;
+		this.adminRole = adminRole;
+	}
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+	public int getAmenityId() {
+		return amenityId;
+	}
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+	public void setAmenityId(int amenityId) {
+		this.amenityId = amenityId;
+	}
 
-    public String getAvailability() { return availability; }
-    public void setAvailability(String availability) { this.availability = availability; }
+	public String getName() {
+		return name;
+	}
 
-    public String getAvailableFrom() { return availableFrom; }
-    public void setAvailableFrom(String availableFrom) { this.availableFrom = availableFrom; }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getAdminRole() { return adminRole; }
-    public void setAdminRole(String adminRole) { this.adminRole = adminRole; }
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getAvailability() {
+		return availability;
+	}
+
+	public void setAvailability(String availability) {
+		this.availability = availability;
+	}
+
+	public String getAvailableFrom() {
+		return availableFrom;
+	}
+
+	public void setAvailableFrom(String availableFrom) {
+		this.availableFrom = availableFrom;
+	}
+
+	public String getAdminRole() {
+		return adminRole;
+	}
+
+	public void setAdminRole(String adminRole) {
+		this.adminRole = adminRole;
+	}
+
 }

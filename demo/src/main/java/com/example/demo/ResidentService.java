@@ -40,9 +40,4 @@ public class ResidentService {
         residentRepository.save(resident);
         return "Status updated successfully";
     }
-
-    public String deleteResident(int resid) {
-        residentRepository.deleteById(resid);
-        return "Resident deleted successfully";
-    }
 }
